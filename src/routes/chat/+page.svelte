@@ -75,28 +75,29 @@
 	}
 </script>
 
-<main>
+<main class="container card bg-gray-100 shadow-md border-surface-200-800 w-1/2 p-4 mx-auto my-4">
 	<form onsubmit={handleSubmit}>
 		<div class="space-y-4">
 			<div class="flex space-x-2">
 				<Avatar src="/hal9000.jpg" name="Tutor girl image" />
-				<div class="assistant-chat">Hello! How can I help you?</div>
+				<div class="assistant-chat container card bg-gray-50 shadow-md border-surface-200-800 p-4">Hello! How can I help you?</div>
 			</div>
 
 			{#each chatHistory as chat, i}
 				{#if chat.role === 'user'}
 					<div class="flex">
-						<Avatar src="/userAvatar.png" name="User image" />
-						<div class="user-chat">
+
+						<div class="user-chat container card bg-gray-50 shadow-md border-surface-200-800 p-4">
 							{chat.content}
 						</div>
+						<Avatar src="/userAvatar.png" name="User image" />                        
 					</div>
 				{/if}
 			{/each}
 
 			<div class="flex">
-				<div class="flex space-x-2">
-                    <Avatar src="/userAvatar.png" name="User image" />
+				<div class="flex space-x-2 container card bg-gray-50 shadow-md border-surface-200-800 p-4">
+                    <!-- <Avatar src="/userAvatar.png" name="User image" /> -->
 					<div class="assistant-chat">
 						{#if response.text === ''}
 							<TypingIndicator />
