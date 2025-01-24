@@ -10,7 +10,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"lDR": "docker-compose down && docker-compose up --build -d && docker image prune -f"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",
@@ -37,6 +38,11 @@
 	"dependencies": {
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"@types/dompurify": "^3.0.5",
+		"dompurify": "^3.2.3",
+		"lucide-svelte": "^0.469.0",
+		"marked": "^15.0.6",
+		"openai": "^4.78.1",
 		"weaviate-client": "^3.3.4"
 	}
 }
