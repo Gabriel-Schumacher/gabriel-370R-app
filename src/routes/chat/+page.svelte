@@ -79,7 +79,7 @@
 	<form onsubmit={handleSubmit}>
 		<div class="space-y-4">
 			<div class="flex space-x-2">
-				<Avatar src="/img-tutor-girl.png" name="Tutor girl image" />
+				<Avatar src="/hal9000.jpg" name="Tutor girl image" />
 				<div class="assistant-chat">Hello! How can I help you?</div>
 			</div>
 
