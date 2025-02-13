@@ -1,4 +1,4 @@
-import weaviate, { connectToWeaviateCloud } from "weaviate-client";
+import weaviate from "weaviate-client";
 import type  { WeaviateClient } from "weaviate-client";
 import type { PageServerLoad } from "./$types";
 

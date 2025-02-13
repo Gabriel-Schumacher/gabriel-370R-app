@@ -11,7 +11,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"lDR": "docker-compose down && docker-compose up --build -d && docker image prune -f"
+		"LDR": "docker-compose down && docker-compose up --build -d && docker image prune -f",
+		"defineEmbeddedFile": "npx tsx src/scripts/defineEmbeddedFile.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",

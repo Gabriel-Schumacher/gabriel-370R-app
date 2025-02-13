@@ -9,5 +9,10 @@
 
 <div class="container m-4">
     <h1>Check Readiness</h1>
-    <p>Is Weaviate ready?: {data.ready ? 'Yes' : 'No'}</p>    
+    {#if data.ready}
+        <p class="text-green-500">Weaviate is ready!</p>
+    {:else}
+        <p class="text-red-500">Weaviate is not ready.</p>
+    {/if}
+    
 </div>
