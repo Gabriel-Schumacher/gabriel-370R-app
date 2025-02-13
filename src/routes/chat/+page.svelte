@@ -6,8 +6,9 @@
 	import DOMPurify from 'dompurify';
 	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
 	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
+	import { tick } from 'svelte';
 
-	let systemPrompt = $state('');
+	let systemPrompt = $state('Hal 9000');
 	let examplePrompt = $state('');
 	let deepSeek = $state(false);
 
@@ -43,6 +44,17 @@
 			})();
 		}
 	});
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter' && !event.shiftKey) {
+			event.preventDefault();
+			const target = event.target as HTMLTextAreaElement;
+			const form = target.closest('form');
+			if (form) {
+				handleSubmit.call(form, event);
+			}
+		}
+	}
 
 	async function handleSubmit(this: HTMLFormElement, event: Event) {
 		event?.preventDefault();
@@ -95,70 +107,115 @@
 	function deleteAllChats() {
 		chatHistory = [];
 	}
+
+	// Function to scroll chat history to the bottom
+	function scrollToBottom() {
+		const chatContainer = document.querySelector('.chat-container');
+		if (chatContainer) {
+			chatContainer.scrollTop = chatContainer.scrollHeight;
+		}
+	}
+
+	$effect(() => {
+	scrollToBottom();
+
+	// Run the async function without making $effect async
+	(async () => {
+		if (response.text !== '') {
+			// Strip <think> tags from the response text
+			const cleanedText = stripThinkTags(response.text);
+			const parsedText = await marked.parse(cleanedText);
+			responseText = DOMPurify.sanitize(parsedText)
+				.replace(/<script>/g, '&lt;script&gt;')
+				.replace(/<\/script>/g, '&lt;/script&gt;');
+			}
+		})();
+	});
+	
+
+
 </script>
 
 <main class="flex min-h-screen flex-col bg-gray-50">
-	<!-- The app bar for this page -->
-	<ChatAppBar
-		bind:selectedSystemPrompt={systemPrompt}
-		bind:selectedExamplePrompt={examplePrompt}
-		bind:deepSeek
-	/>
+	<div class="hover-area">
+		<img src="/setting-icon.png" alt="Settings" class="w-10 h-10 m-8" />
+	</div>
+    <div class="side-nav bg-secondary-300 text-white">
+        <ChatAppBar
+            bind:selectedSystemPrompt={systemPrompt}
+            bind:selectedExamplePrompt={examplePrompt}
+            bind:deepSeek
+        />
+    </div>
 
-	<div class="mx-auto max-w-[80%] min-w-[80%]">
+
+	<div class="mx-auto max-w-[75%] min-w-[75%]">
 		<form
 			onsubmit={handleSubmit}
 			class="m-4 p-2 flex flex-col"
 		>
 			<div class="space-y-4">
+				
+
+				<!-- Need to display each chat item here -->
+				 <div class="chat-container h-[40vh] overflow-y-auto space-y-4 px-4">
 				<div class="flex space-x-2">
 					<Avatar src="/hal9000.jpg" name="Hal tutor image" />
 					<div class="assistant-chat">Good Afternoon. How can I help you?</div>
-				</div>
-				<!-- Need to display each chat item here -->
-				{#each chatHistory as chat, i}
-					{#if chat.role === 'user'}
-						<div class="ml-auto flex justify-end">
-							<div class="user-chat">
-								{chat.content}
+				</div>					
+					{#each chatHistory as chat, i}
+						{#if chat.role === 'user'}
+							<div class="ml-auto flex justify-end">
+								<div class="user-chat">
+									{chat.content}
+								</div>
+								<div>
+									<Avatar src="/userAvatar.png" name="User image" />
+								</div>							
 							</div>
-							<div>
-								<Avatar src="/userAvatar.png" name="User image" />
-							</div>							
-						</div>
-						<!-- this else handles the assistant role chat display -->
-					{:else}
-						<div class="mr-auto flex">
-							<div>
-								<Avatar src="/hal9000.jpg" name="Hal tutor image" />
-							</div>
-							<div class="assistant-chat">
-								{@html chat.content}
-							</div>
-						</div>
-					{/if}
-				{/each}
-
-				{#if response.loading}
-					{#await new Promise((res) => setTimeout(res, 400)) then _}
-						<div class="flex">
-							<div class="flex space-x-2">
-								<Avatar name="Hal tutor image" src={'/hal9000.jpg'} />
+							<!-- this else handles the assistant role chat display -->
+						{:else}
+							<div class="mr-4 flex">
+								<div>
+									<Avatar src="/hal9000.jpg" name="Hal tutor image" />
+								</div>
 								<div class="assistant-chat">
-									{#if response.text === ''}
-										<TypingIndicator />
-									{:else}
-										{@html responseText}
-									{/if}
+									{@html chat.content}
 								</div>
 							</div>
-						</div>
-					{/await}
-				{/if}
+						{/if}
+					{/each}
+
+					{#if response.loading}
+						{#await new Promise((res) => setTimeout(res, 400)) then _}
+							<div class="flex">
+								<div class="flex space-x-2">
+									<div>
+										<Avatar name="Hal tutor image" src={'/hal9000.jpg'} />										
+									</div>
+
+									<div class="assistant-chat">
+										{#if response.text === ''}
+											<div class="flex">
+												<p>Collating &nbsp;</p>
+												<TypingIndicator />											
+											</div>
+
+										{:else}
+											{@html responseText}
+										{/if}
+									</div>
+								</div>
+							</div>
+						{/await}
+					{/if}					
+				 </div>
+
 				<div class="space-y-4">
 					<hr />
 					<div class="flex space-x-4">
 						<textarea
+							onkeydown={handleKeydown}
 							class="textarea"
 							required
 							placeholder="Type your message..."
@@ -179,18 +236,44 @@
 </main>
 
 <style lang="postcss">
-.assistant-chat {
-	background-color: white;
-	margin: 0 1rem;
-	padding: 1rem;
-	border-radius: 0.5rem;
-	box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
-}
-.user-chat {
-	background-color: rgb(var(--color-primary-200) / var(--tw-bg-opacity, 1));
-	margin: 0 1rem;
-	padding: 1rem;
-	border-radius: 0.5rem;
-	box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
-}
-</style>
+	.assistant-chat {
+		background-color: white;
+		margin: 0 1rem;
+		padding: 1rem;
+		border-radius: 0.5rem;
+		box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+	}
+	.user-chat {
+		background-color: rgb(var(--color-primary-200) / var(--tw-bg-opacity, 1));
+		margin: 0 1rem;
+		padding: 1rem;
+		border-radius: 0.5rem;
+		box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+	}
+	.side-nav {
+		position: fixed;
+		top: 0;
+		left: -250px; /* Hide the nav initially */
+		width: 250px;
+		height: 100%;
+		transition: left 0.3s ease;
+		z-index: 1000;
+		padding: 1rem;
+	}
+
+	/* Adjust hover area to trigger the nav slide */
+	.side-nav:hover,
+	.hover-area:hover + .side-nav {
+		left: 0; /* Show the nav on hover */
+	}
+
+	/* Add a hover area to trigger the nav slide */
+	.hover-area {
+		position: fixed;
+		top: 20;
+		left: 0;
+		width: 50px; /* Adjust this value to change the hover area width */
+		height: 100%;
+		z-index: 999;
+	}
+	</style>

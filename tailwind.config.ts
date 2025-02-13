@@ -15,7 +15,15 @@ export default {
 		typography,
 		forms,
 		skeleton({
-			themes: [themes.cerberus, themes.rose]
+			themes: [
+				themes.cerberus, 
+				themes.rose,
+				themes.pine,
+				themes.wintry,
+				themes.hamlindigo,
+				themes.concord,
+				themes.nouveau
+			]
 		})
 	]
 } satisfies Config;
