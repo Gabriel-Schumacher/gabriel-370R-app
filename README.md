@@ -6,5 +6,5 @@ This app is for my 370R class
 * AI Chat API: https://github.com/Gabriel-Schumacher/gabriel-370R-app/blob/main/src/routes/api/chat/%2Bserver.ts
 * AI Chat Settings: https://github.com/Gabriel-Schumacher/gabriel-370R-app/blob/main/src/lib/components/ChatAppBar.svelte
 ## Getting Started
-npm run install
-npm run dev
+* npm run install
+* npm run dev
