@@ -6,7 +6,6 @@
 	import DOMPurify from 'dompurify';
 	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
 	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
-	import { tick } from 'svelte';
 
 	let systemPrompt = $state('Hal 9000');
 	let examplePrompt = $state('');

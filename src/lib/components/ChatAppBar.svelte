@@ -3,10 +3,10 @@
 	let systemPrompts = ['Hal 9000', 'Yoda', 'Jesse Pinkman', 'Forest Gump', 'Dwight Schrute'];
 
 	let examplePrompts = [
-		'Tell me a joke',
-		'Explain quantum computing',
-		'Write a haiku about programming',
-		'Describe the benefits of exercise'
+		'What is the best bear?',
+		'which form of government is the best?',
+		'Write a haiku about seagulls',
+		'Describe the benefits of coding exercises'
 	];
 
 	let {
