@@ -2,6 +2,12 @@ import weaviate, { dataType, type WeaviateClient, type Collection, connectToLoca
 
 let client: WeaviateClient;
 
+async function connectToWeaviate(): Promise<WeaviateClient> {
+	const clientPromise = await weaviate.connectToLocal()
+
+	return clientPromise;
+}
+
 const embeddedFileSchema = {
     name: 'Chunks',
     description: 'Relevant chunks of text from selected PDF files',
@@ -48,7 +54,7 @@ async function addCollection() {
         await client.collections.create(embeddedFileSchema);
         console.log('Added chunks collection')
     } catch (error) {
-        console.error('Error adding chunks collection', error)
+        console.error('Error adding chunks collection. Does the it already exist?', error)
     }
 }
 
@@ -56,9 +62,9 @@ async function run() {
     const startTime: Date = new Date()
     console.log('Starting user embedded file schema creation...')
 
-    client = await connectToLocal()
+    client = await connectToWeaviate()
     await addCollection()
-    //await client.collections.delete('Chunks')
+    // await client.collections.delete('Chunks')
 
     const endTime: Date = new Date()
     const elapsedTime: number = endTime.getTime() - startTime.getTime();

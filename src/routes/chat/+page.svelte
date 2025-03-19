@@ -7,6 +7,7 @@
 	import DOMPurify from 'dompurify';
 	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
 	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
+	import { CircleX } from 'lucide-svelte'
 
 	import hljs from 'highlight.js';
 	import javascript from 'highlight.js/lib/languages/javascript';
@@ -27,13 +28,26 @@
 		})
 	)
 
+	interface PageData {
+		fileNames?: string[]
+	}
+
+	let { data } = $props<{data: PageData}>()
+
 	let systemPrompt = $state('Hal 9000');
 	let examplePrompt = $state('');
 	let deepSeek = $state(false);
+	let fileNames = $state([] as string[])
 
 	let chatHistory = $state(
 		typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('chatHistory') || '[]') : []
 	);
+
+	$effect(() => {
+		if (data?.fileNames) {
+			fileNames = [...data.fileNames]
+		}
+	})
 
 	$effect(() => {
 		if (typeof window !== 'undefined') {
@@ -98,7 +112,8 @@
 					body: JSON.stringify({
 						chats: chatHistory,
 						systemPrompt,
-						deepSeek
+						deepSeek,
+						fileNames,
 					})
 				})
 			);
@@ -125,6 +140,10 @@
 
 	function deleteAllChats() {
 		chatHistory = [];
+	}
+
+	function deleteFileName(fileName: string) {
+		fileNames = fileNames.filter((name) => name !== fileName)
 	}
 
 	// Function to scroll chat history to the bottom
@@ -177,7 +196,7 @@
 				
 
 				<!-- Need to display each chat item here -->
-				 <div class="chat-container h-[40vh] overflow-y-auto space-y-4 px-4">
+				 <div class="chat-container h-[60vh] overflow-y-auto space-y-4 px-4">
 				<div class="flex space-x-2">
 					<Avatar src="/hal9000.jpg" name="Hal tutor image" />
 					<div class="assistant-chat">Good Afternoon. How can I help you?</div>
@@ -250,7 +269,27 @@
 				</div>
 			</div>
 		</form>
-		<FileUploadAside/>
+		<div class="flex gap-1">
+			<FileUploadAside/>
+			<div>
+				<p>You can also upload a file. I will do my best to help you!</p>
+				{#if fileNames.length > 0}
+				<div class="flex items-center gap-4 flex-wrap">
+					{#each fileNames as fileName}
+						<div class="flex items-center gap-2">
+							<button
+								type="button"
+								class="btn preset-filled-primary-500">
+								<span>{fileName}</span>
+								<CircleX onclick={() => deleteFileName(fileName)} />
+							</button>
+						</div>
+					{/each}
+				</div>
+			{/if}
+			</div>			
+		</div>
+
 	</div>
 </main>
 
