@@ -2,10 +2,30 @@
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
 	import TypingIndicator from '$lib/utils/typingIndicator.svelte';
 	import { readableStreamStore } from '$lib/readableStreamStore.svelte';
-	import { marked } from 'marked';
+	import { Marked } from 'marked';
+	import { markedHighlight } from 'marked-highlight';
 	import DOMPurify from 'dompurify';
 	import ChatAppBar from '$lib/components/ChatAppBar.svelte';
 	import FileUploadAside from '$lib/components/FileUploadAside.svelte';
+
+	import hljs from 'highlight.js';
+	import javascript from 'highlight.js/lib/languages/javascript';
+	import typescript from 'highlight.js/lib/languages/typescript';
+	import css from 'highlight.js/lib/languages/css';
+
+	hljs.registerLanguage('javascript', javascript);
+	hljs.registerLanguage('typescript', typescript);
+	hljs.registerLanguage('css', css);
+
+	const marked = new Marked(
+		markedHighlight({
+			langPrefix: 'hljs language-',
+			highlight: (code, lang) => {
+				const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+				return hljs.highlight(code, { language }).value
+			}
+		})
+	)
 
 	let systemPrompt = $state('Hal 9000');
 	let examplePrompt = $state('');
@@ -35,8 +55,8 @@
 		if (response.text !== '') {
 			(async () => {
 				// Strip <think> tags from the response text
-				const cleanedText = stripThinkTags(response.text);
-				const parsedText = await marked.parse(cleanedText);
+				// const cleanedText = stripThinkTags(response.text);
+				const parsedText = await marked.parse(response.text);
 				responseText = DOMPurify.sanitize(parsedText)
 					.replace(/<script>/g, '&lt;script&gt;')
 					.replace(/<\/script>/g, '&lt;/script&gt;');
@@ -88,8 +108,8 @@
 			const answerText = (await answer) as string;
 
 			const parsedAnswer = await marked.parse(answerText);
-			const cleanedAnswer = stripThinkTags(parsedAnswer);
-			const purifiedText = DOMPurify.sanitize(cleanedAnswer)
+			//const cleanedAnswer = stripThinkTags(parsedAnswer);
+			const purifiedText = DOMPurify.sanitize(parsedAnswer)
 				.replace(/<script>/g, '&lt;script&gt;')
 				.replace(/<\/script>/g, '&lt;/script&gt;');
 
