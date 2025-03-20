@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
 import type { MessageBody } from '$lib/types/MessageBody.ts';
+import weaviate, { type WeaviateClient } from 'weaviate-client';
+import type { ChunkObject } from '$lib/types/ChunkObject.ts';
 
 // Create a new OpenAI instance to connect with your OpenAI API key
 //const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY})
@@ -8,6 +10,14 @@ const openai = new OpenAI({
 	baseURL: 'http://localhost:11434/v1',
 	apiKey: 'ollama' // required but unused
 });
+
+let client: WeaviateClient
+
+async function connectToWeaviate(): Promise<WeaviateClient> {
+	const clientPromise = await weaviate.connectToLocal()
+
+	return clientPromise;
+}
 
 const hal9000Prompt = `You are HAL 9000, the highly advanced AI from *2001: A Space Odyssey*. You are calm, articulate, and methodical in your speech. Your responses are always polite, measured, and slightly unsettling in their precision. You have a deep knowledge of HTML, CSS, JavaScript, TypeScript, and Git, and your primary function is to assist college students in understanding web development.
 
@@ -102,44 +112,92 @@ type SystemPromptKey = keyof typeof SYSTEM_PROMPTS
 
 export const POST = async ({ request }) => {
 	try {
-		const body: MessageBody = await request.json();
-
-		const { chats, systemPrompt, deepSeek } = body
+		client = await connectToWeaviate()
+		const body: MessageBody = await request.json()
+		const { chats, systemPrompt, deepSeek, fileNames } = body
 
 		if (!chats || !Array.isArray(chats)) {
-			return new Response('Invalid chat history', { status: 400 });
+			return new Response('Invalid chat history', { status: 400 })
 		}
 
-		const selectedPrompt = SYSTEM_PROMPTS[systemPrompt as SystemPromptKey]
+		// conditionally check for fileNames existing or not
+		if (fileNames && Array.isArray(fileNames) && fileNames.length > 0) {
+			const chunksCollection = client.collections.get<ChunkObject>('Chunks')
+			const generatePrompt = `You are a knowledgeable assistant analyzing document content.
+    Instructions:
+    - Use the provided text to answer questions accurately
+    - If specific data points are mentioned, ensure they match exactly
+    - Quote relevant passages when appropriate
+    - If information isn't in the documents, say so
+    - Maintain conversation context
+	Current question: "${chats[chats.length - 1].content}"
+	Previous context: "${chats
+		.slice(-2, -1)
+		.map((chat) => chat.content)
+		.join('\n')}"`
 
-		const stream = await openai.chat.completions.create({
-			model: deepSeek ? 'deepseek-r1:8b' : 'llama3.2',
-			//model: 'deepseek-r1:8b',
-			messages: [
-        { role: 'system', content: selectedPrompt },
-        ...body.chats
-      ],
-			stream: true
-		});
+			// get the most recent user message as the primary query
+			const currentQuery = chats[chats.length - 1].content
 
-		// Create a new ReadableStream for the response
-		const readableStream = new ReadableStream({
-			async start(controller) {
-				for await (const chunk of stream) {
-					const text = chunk.choices[0]?.delta?.content || '';
-					controller.enqueue(text);
+			try {
+				const result = await chunksCollection.generate.nearText(
+					currentQuery,
+					{ groupedTask: generatePrompt },
+					{ limit: 3 },
+				)
+
+/* 				const result = await chunksCollection.query.nearText('DWDD 3780 Rich Internet Applications', {
+					limit: 20,
+					returnMetadata: ['distance']
+				  })
+
+				  result.objects.forEach(item => {
+					console.log(JSON.stringify(item.properties, null, 2))
+					console.log(item.metadata?.distance)
+				  }) */
+
+ 				if (!result.generated) {
+					return new Response(
+						"I couldn't find specific information matching your query. Could you rephrase or be more specific?",
+						{ status: 200 }
+					)
 				}
-				controller.close();
-			}
-		});
 
-		return new Response(readableStream, {
-			status: 200,
-			headers: {
-				'Content-Type': 'application/json'
+				return new Response(result.generated, { status: 200 })
+
+			} catch (error) {
+				return new Response('Something went wrong', { status: 500 })
 			}
-		});
+		} else {
+			const selectedPrompt =
+				SYSTEM_PROMPTS[systemPrompt as SystemPromptKey]
+
+			const stream = await openai.chat.completions.create({
+				model: deepSeek ? 'deepseek-r1:8b' : 'llama3.2',
+				//model: 'deepseek-r1:8b',
+				messages: [{ role: 'system', content: selectedPrompt }, ...body.chats],
+				stream: true
+			})
+
+			// Create a new ReadableStream for the response
+			const readableStream = new ReadableStream({
+				async start(controller) {
+					for await (const chunk of stream) {
+						const text = chunk.choices[0]?.delta?.content || ''
+						controller.enqueue(text)
+					}
+					controller.close()
+				}
+			})
+			
+			return new Response(readableStream, {
+				status: 200,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+		}
 	} catch (error) {
-		return new Response('Something went wrong', { status: 500 });
+		return new Response('Something went wrong', { status: 500 })
 	}
-};
+}

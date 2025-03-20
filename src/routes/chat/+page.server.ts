@@ -133,7 +133,7 @@ async function createFileDataObject(uploadedFilePath: string) {
             const chunk = pageContent.slice(startingPos, startingPos + (OPTIMAL_CHUNK_SIZE * CHARS_PER_TOKEN))
 
             chunks.push({
-                chunk_text: chunks,
+                chunk_text: chunk,
                 file_name: path.basename(uploadedFilePath),
                 metadata: {
                     totalPages: docs.length,
@@ -146,7 +146,7 @@ async function createFileDataObject(uploadedFilePath: string) {
             startingPos += ((OPTIMAL_CHUNK_SIZE - CHUNK_OVERLAP) * CHARS_PER_TOKEN)
 
         }
-        // console.log('Chunks: ', chunks)
+        console.log('Chunks: ', chunks)
     }
     await importedFileChunks(chunks)
     return { success: true}

@@ -54,7 +54,20 @@ async function addCollection() {
         await client.collections.create(embeddedFileSchema);
         console.log('Added chunks collection')
     } catch (error) {
-        console.error('Error adding chunks collection. Does the it already exist?', error)
+        console.error('Error adding chunks collection. Does it already exist?', error)
+    }
+}
+
+async function getCollectionCount(collectionName: string) {
+    try {
+        const collection: Collection = client.collections.get(collectionName)
+        let count = 0
+        for await (const _ of collection.iterator()) {
+            count++
+        }
+        console.log(`The ${collectionName} collection has ${count} items`)
+    } catch (err) {
+        console.error(`Failed to get the ${collectionName} collection`)
     }
 }
 
@@ -64,6 +77,7 @@ async function run() {
 
     client = await connectToWeaviate()
     await addCollection()
+    // await getCollectionCount('Chunks')
     // await client.collections.delete('Chunks')
 
     const endTime: Date = new Date()
