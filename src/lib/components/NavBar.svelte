@@ -10,6 +10,11 @@
             </a>
         </li>
         <li>
+            <a href="../images/">
+                <button class="btn preset-filled-primary-500">Images</button>  
+            </a>
+        </li>
+        <li>
             <a href="../check_readiness/">
                 <button class="btn preset-filled-primary-500">Check Readiness</button>  
             </a>
