@@ -146,7 +146,8 @@ export const POST = async ({ request }) => {
 					{ limit: 3 },
 				)
 
-/* 				const result = await chunksCollection.query.nearText('DWDD 3780 Rich Internet Applications', {
+/* 				Example of how to use the distance metadata
+				const result = await chunksCollection.query.nearText('DWDD 3780 Rich Internet Applications', {
 					limit: 20,
 					returnMetadata: ['distance']
 				  })
@@ -165,7 +166,7 @@ export const POST = async ({ request }) => {
 
 				return new Response(result.generated, { status: 200 })
 
-			} catch (error) {
+			} catch {
 				return new Response('Something went wrong', { status: 500 })
 			}
 		} else {
@@ -197,7 +198,7 @@ export const POST = async ({ request }) => {
 				}
 			})
 		}
-	} catch (error) {
+	} catch {
 		return new Response('Something went wrong', { status: 500 })
 	}
 }

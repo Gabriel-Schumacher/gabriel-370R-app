@@ -1,0 +1,312 @@
+{
+  "totalChunks": 34,
+  "timestamp": "2025-03-21T19:25:46.624Z",
+  "chunks": [
+    {
+      "text": "Introduction to JavaScript\nPat Morin\nCOMP2405",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 1,
+        "chunkIndex": 0
+      }
+    },
+    {
+      "text": "2\nOutline\n•\nWhat is JavaScript?\n–\nHistory\n–\nUses\n•\nAdding JavaScript to HTML\n•\nJavaScript syntax\n•\nJavaScript events\n•\nJavaScript classes\n•\nThe HTML Document Object Model",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 2,
+        "chunkIndex": 1
+      }
+    },
+    {
+      "text": "3\nWhat is JavaScript?\n•\nJavaScript is a programming language for use in \nHTML pages\n•\nInvented in 1995 at Netscape Corporation \n(LiveScript)\n•\nJavaScript has nothing to do with Java\n•\nJavaScript programs are run by an interpreter built \ninto the user's web browser (not on the server)",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 3,
+        "chunkIndex": 2
+      }
+    },
+    {
+      "text": "4\nWhere does JavaScript Fit In?\n•\nRecall\n1.client opens connection to server\n2.client sends request to server\n3.server sends response to client\n4.client and server close connection\n•\nWhat about Step 5?\n5.Client renders (displays) the response received from server\n•\nStep 5 involves displaying HTML\n•\nAnd running any JavaScript code within the HTML",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 4,
+        "chunkIndex": 3
+      }
+    },
+    {
+      "text": "5\nWhat can JavaScript Do?\n•\nJavaScript can dynamically modify an HTML page\n•\nJavaScript can react to user input\n•\nJavaScript can validate user input\n•\nJavaScript can be used to create cookies (yum!)\n•\nJavaScript is a full-featured programming language\n•\nJavaScript user interaction does not require any \ncommunication with the server",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 5,
+        "chunkIndex": 4
+      }
+    },
+    {
+      "text": "6\nPros and Cons of JavaScript\n•\nPros:\n–\nAllows more dynamic HTML pages, even complete web \napplications\n•\nCons:\n–\nRequires a JavaScript-enabled browser\n–\nRequires a client who trusts the server enough to run the \ncode the server provides\n•\nJavaScript has some protection in place but can \nstill cause security problems for clients\n–\nRemember JavaScript was invented in 1995 and web-\nbrowsers have changed a lot since then",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 6,
+        "chunkIndex": 5
+      }
+    },
+    {
+      "text": "7\nUsing JavaScript in your HTML\n•\nJavaScript can be inserted into documents by \nusing the SCRIPT tag\n<html>\n<head>\n<title>Hello World in JavaScript</title>\n</head>\n<body>\n  <script type=\"text/javascript\">\n    document.write(\"Hello World!\");\n  </script>\n</body>\n</html> ",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 7,
+        "chunkIndex": 6
+      }
+    },
+    {
+      "text": "8\nWhere to Put your Scripts\n•\nYou can have any number of scripts\n•\nScripts can be placed in the HEAD or in the BODY\n–\nIn the HEAD, scripts are run before the page is displayed\n–\nIn the BODY, scripts are run as the page is displayed\n•\nIn the HEAD is the right place to define functions \nand variables that are used by scripts within the \nBODY",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 8,
+        "chunkIndex": 7
+      }
+    },
+    {
+      "text": "9\nUsing JavaScript in your HTML\n<html>\n<head>\n<title>Hello World in JavaScript</title>\n<script type=\"text/javascript\">\n  function helloWorld() {\n    document.write(\"Hello World!\");\n  }\n</script>\n</head>\n<body>\n  <script type=\"text/javascript\">\n    helloWorld();\n  </script>\n</body>\n</html> ",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 9,
+        "chunkIndex": 8
+      }
+    },
+    {
+      "text": "10\nExternal Scripts\n•\nScripts can also be loaded from an external file\n•\nThis is useful if you have a complicated script or \nset of subroutines that are used in several different \ndocuments\n<script src=\"myscript.js\"></script>",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 10,
+        "chunkIndex": 9
+      }
+    },
+    {
+      "text": "11\nJavaScript Variables\n•\nJavaScript has variables that you can declare with \nthe optional var keyword\n•\nVariables declared within a function are local to \nthat function\n•\nVariables declared outside of any function are \nglobal variables\nvar myname = \"Pat Morin\";",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 11,
+        "chunkIndex": 10
+      }
+    },
+    {
+      "text": "12\nJavaScript Operators and Constructs\n•\nJavaScript has most of the operators we're used to \nfrom C/Java\n–\nArithmetic (+, - , *, /, %)\n–\nAssignment (=, +=, -=, *= /=, %=, ++, --)\n–\nLogical (&&, ||, !)\n–\nComparison (<, >, <=, >=, ==)\n•\nNote: + also does string concatentation\n•\nConstructs: \n–\nif, else, while, for, switch, case",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 12,
+        "chunkIndex": 11
+      }
+    },
+    {
+      "text": "13\nSimple User Interaction\n•\nThere are three built-in methods of doing simple \nuser interaction\n–\nalert(msg) alerts the user that something has happened\n–\nconfirm(msg) asks the user to confirm (or cancel) \nsomething\n–\nprompt(msg, default) asks the user to enter some text\nalert(\"There's a monster on the wing!\");\nconfirm(\"Are you sure you want to do that?\");\nprompt(\"Enter you name\", \"Adam\");",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 13,
+        "chunkIndex": 12
+      }
+    },
+    {
+      "text": "14\nJavaScript Functions\n•\nJavaScript lets you define functions using the \nfunction keyword\n•\nFunctions can return values using the return \nkeyword\nfunction showConfirm() {\n  confirm(\"Are you sure you want to do that?\");\n}",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 14,
+        "chunkIndex": 13
+      }
+    },
+    {
+      "text": "15\nJavaScript Arrays\n•\nJavaScript has arrays that are indexed starting at 0\n•\nSpecial version of for works with arrays\n<script type=\"text/javascript\">\n  var colors = new Array();\n  colors[0] = \"red\"; colors[1] = \"green\";\n  colors[2] = \"blue\"; colors[3] = \"orange\";\n  colors[4] = \"magenta\"; colors[5] = \"cyan\";\n  for (var i in colors) {\n    document.write(\"<div style=\\\"background-color:\" \n                   + colors[i] + \";\\\">\"\n                   + colors[i] + \"</div>\\n\");\n  }\n</script>",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 15,
+        "chunkIndex": 14
+      }
+    },
+    {
+      "text": "16\nJavaScript Events\n•\nJavaScript can be made to respond to user events\n•\nCommon Events:\n–\nonload and onunload : when a page is first visited or left\n–\nonfocus, onblur, onchange : events pertaining to form \nelements\n–\nonsubmit : when a form is submitted\n–\nonmouseover, onmouseout : for \"menu effects\"\n•\nA complete list of event types is available here\n–\nhttp://www.w3schools.com/jsref/jsref_events.asp",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 16,
+        "chunkIndex": 15
+      }
+    },
+    {
+      "text": "17\nException Handling\n•\nJavaScript also has try, catch, and throw \nkeywords for handling JavaScript errors\ntry {\n  runSomeCode();\n} catch(err) {\n  var txt=\"There was an error on this page.\\n\\n\"\n          + \"Error description: \" \n          + err.description + \"\\n\\n\"\n  alert(txt)\n}",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 17,
+        "chunkIndex": 16
+      }
+    },
+    {
+      "text": "18\nComments in JavaScript\n•\nComments in JavaScript are delimited with // and /* \n*/ as in Java and C++",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 18,
+        "chunkIndex": 17
+      }
+    },
+    {
+      "text": "19\nJavaScript Objects\n•\nJavaScript is object-oriented and uses the same \nmethod-calling syntax as Java\n•\nWe have already seen this with the document \nobject\ndocument.write(\"Hello World!\");",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 19,
+        "chunkIndex": 18
+      }
+    },
+    {
+      "text": "20\nBuilt-In JavaScript Objects\n•\nSome basic objects are built-in to JavaScript\n–\nString\n–\nDate\n–\nArray\n–\nBoolean\n–\nMath",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 20,
+        "chunkIndex": 19
+      }
+    },
+    {
+      "text": "21\nJavaScript Strings\n•\nA String object is created every time you use a \nstring literal (just like in Java)\n•\nHave many of the same methods as in Java\n–\ncharAt, concat, indexOf, lastIndexOf, match, replace, search, \nslice, split, substr, substring, toLowerCase, toUpperCase, \nvalueOf\n•\nThere are also some HTML specific methods\n–\nbig, blink, bold, fixed, fontcolor, fontsize, italics, link, small, \nstrike, sub, sup\n•\nDon't use the HTML methods (use CSS instead)\n–\nThis is the worst kind of visual formatting",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 21,
+        "chunkIndex": 20
+      }
+    },
+    {
+      "text": "22\nJavaScript Dates\n•\nThe Date class makes working with dates easier\n•\nA new date is initialized with the current date\n•\nDates can be compared and incremented\nvar myDate = new Date();\nmyDate.setFullYear(2007,2,14);\nvar today = new Date();\nvar nextWeek = today + 7;\nif (nextWeek > today) {\n  alert(\"You have less than one week left\");\n}",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 22,
+        "chunkIndex": 21
+      }
+    },
+    {
+      "text": "23\nJavaScript Arrays and Booleans\n•\nWe have already seen the Array class\n•\nThe Boolean class encapsulates a boolean value",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 23,
+        "chunkIndex": 22
+      }
+    },
+    {
+      "text": "24\nThe JavaScript Math Class\n•\nThe Math class encapsulates many commonly-\nused mathematical entities and formulas\n•\nThese are all class methods\n–\nabs, acos, asin, atan, atan2, ceil, cos, exp, floor, log, max, \nmin, pow, random, round, sin, sqrt, tan\n•\nThese are all class methods\n–\nE, LN2, LN10, LOG2E, LOG10E, PI, SQRT1_2, SQRT2\nif (Math.cos(Math.PI) != 0) {\n  alert(\"Something is wrong with Math.cos\");\n}",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 24,
+        "chunkIndex": 23
+      }
+    },
+    {
+      "text": "25\nJavaScript and the DOM\n•\nThe Document Object Model (DOM) is a \nspecification that determines a mapping between \nprogramming language objects and the elements \nof an HTML document\n•\nNot specific to JavaScript",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 25,
+        "chunkIndex": 24
+      }
+    },
+    {
+      "text": "26\nHTML DOM Objects\n•\nEnvironment objects\n–\nWindow, Navigator, Screen, History, Location, Document\n•\nHTML objects\n–\nAnchor, Area, Base, Body, Button, Event, Form, Frame, \nFrameset, Iframe, Image, Checkbox, FileUpload, Hidden, \nPassword, Radio, Reset, Submit, Text, Link, Meta, Object, \nOption, Select, Style, Table, TableCell, TableRow, TextArea",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 26,
+        "chunkIndex": 25
+      }
+    },
+    {
+      "text": "27\nHTML DOM: Document\n•\nThe Document object represents an HTML \ndocument and can be used to access all \ndocuments in a page\n•\nA Document contains several collections\n–\nanchors, forms, images, links\n•\nHas several properties\n–\nbody, cookie, domain, lastModified, referrer, title, URL\n•\nHas several useful methods\n–\ngetElementById, getElementsByName, \ngetElementsByTagName, write, writeln, open, close",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 27,
+        "chunkIndex": 26
+      }
+    },
+    {
+      "text": "28\nHTML DOM: Document\n•\nAn instance of Document is already created for \nyou, called document\nfunction changeF() {\n  var cText = document.getElementById(\"c\");\n  var fText = document.getElementById(\"f\");\n  ...\n}\n...\n<input type=\"text\" id=\"c\" onchange=\"changeC()\">C\n<input type=\"text\" id=\"f\" onchange=\"changeF()\">F",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 28,
+        "chunkIndex": 27
+      }
+    },
+    {
+      "text": "29\nHTML DOM: Form Elements\n•\nOne of the most common uses of JavaScript is for \nform validation\n•\nSeveral HTML DOM classes encapsulate form \nelements\n–\nForm, Button, Checkbox, Hidden, Password, Text, Radio, \nReset, Submit, Textarea\n•\nWarning: Using JavaScript is not a substitute for \nvalidating form data in CGI scripts",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 29,
+        "chunkIndex": 28
+      }
+    },
+    {
+      "text": "30\nHTML DOM: Text\n•\nA text entry field (input type=\"text\") is \nencapsulated by a Text object\n•\nVariables\n–\nvalue, maxLength, id, size, name, tabindex, readOnly\n•\nChanging these variables has an immediate effect \non the displayed data",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 30,
+        "chunkIndex": 29
+      }
+    },
+    {
+      "text": "31\nHTML DOM: The Document Tree\n•\nAccessing elements and changing their properties \nlets us do simple things like form validation, data \ntransfer etc\n•\nHTML DOM lets us do much more\n•\nWe can create, delete, and modify parts of the \nHTML document\n•\nFor this we need to understand the Document Tree",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 31,
+        "chunkIndex": 30
+      }
+    },
+    {
+      "text": "32\nHTML DOM: The Document Tree",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 32,
+        "chunkIndex": 31
+      }
+    },
+    {
+      "text": "33\nNavigating the Document Tree\n•\nWith JavaScript we can navigate the document \ntree\n•\ndocument.getElementById(), \ngetElementsByName(), and \ngetElementsByTagName() return nodes in the \ndocument tree\n•\nInformation can be obtained from\n–\nnodeName –   The tag name\n–\nnodeValue –   The the text of a text node\n–\nnodeType –   The kind of node",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 33,
+        "chunkIndex": 32
+      }
+    },
+    {
+      "text": "34",
+      "fileName": "javascript1.pdf",
+      "metadata": {
+        "totalPages": 34,
+        "pageNumberLocation": 34,
+        "chunkIndex": 33
+      }
+    }
+  ]
+}

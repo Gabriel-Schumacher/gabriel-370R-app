@@ -103,7 +103,7 @@ export const actions = {
                 data: addedFileData
             }
         }
-        catch (e) {
+        catch {
             return {
                 status: 500,
                 body: {
@@ -123,7 +123,7 @@ async function createFileDataObject(uploadedFilePath: string) {
     })
 
     const docs = await loader.load()
-    const chunks:any[] = []
+    const chunks: { chunk_text: string; file_name: string; metadata: { totalPages: number; pageNumberLocation: number; chunkIndex: number } }[] = []
 
     for (const doc of docs) {
         const pageContent = doc.pageContent
@@ -152,7 +152,7 @@ async function createFileDataObject(uploadedFilePath: string) {
     return { success: true}
 }
 
-async function importedFileChunks(chunks: any[]) {
+async function importedFileChunks(chunks: { chunk_text: string; file_name: string; metadata: { totalPages: number; pageNumberLocation: number; chunkIndex: number } }[]) {
     client = await connectToWeaviate()
     const fileChunkCollection = client.collections.get<ChunkObject>('Chunks')
 
