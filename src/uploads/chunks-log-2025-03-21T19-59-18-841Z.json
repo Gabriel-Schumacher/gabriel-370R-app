@@ -1,0 +1,24 @@
+{
+  "totalChunks": 2,
+  "timestamp": "2025-03-21T19:59:18.841Z",
+  "chunks": [
+    {
+      "text": "Book One \nAct I - Goal: 76,500 words \n \nMantei \nMantei Act I - 5 Chapters \nMantei Chapter One: The Suspicious setup \n Mantei sat across from her husband Ghee in a rattling carriage. The well traveled \nroad to the capital had been significantly worse than the roads in the countryside. A \nwave of nausea hit Mantei, and she controlled her breathing to stop from vomiting.  \n “How are you holding up?” Ghee asked, clicking his fingers on the seat. \n “Well enough, my lord. Although, I would like to stretch my legs soon.” she \nreplied. \n “Let me see how close we are.”  \n He turned around and slid open a small window to the driver. \n “Can you see it yet?” he asked. \n “Nearly there my lord” the driver shouted back. Ghee sat straight and shrugged, \n “He said we’re nearly there.” \n I’ll open my legs and have the baby in this carriage, would you like that? \n She must have had a sour expression, as Ghee turned back around and opened \nthe window again, ",
+      "fileName": "Test.pdf",
+      "metadata": {
+        "totalPages": 2,
+        "pageNumberLocation": 1,
+        "chunkIndex": 0
+      }
+    },
+    {
+      "text": " ",
+      "fileName": "Test.pdf",
+      "metadata": {
+        "totalPages": 2,
+        "pageNumberLocation": 2,
+        "chunkIndex": 1
+      }
+    }
+  ]
+}

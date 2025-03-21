@@ -12,7 +12,8 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"LDR": "docker-compose down && docker-compose up --build -d && docker image prune -f",
-		"defineEmbeddedFile": "npx tsx src/scripts/defineEmbeddedFile.ts"
+		"defineEmbeddedFile": "npx tsx src/scripts/defineEmbeddedFile.ts",
+		"configCLIP": "npx tsx src/scripts/configCLIP.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",
