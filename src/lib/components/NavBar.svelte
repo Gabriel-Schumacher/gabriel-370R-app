@@ -15,6 +15,11 @@
             </a>
         </li>
         <li>
+            <a href="../search/">
+                <button class="btn preset-filled-primary-500">Search</button>  
+            </a>
+        </li>
+        <li>
             <a href="../check_readiness/">
                 <button class="btn preset-filled-primary-500">Check Readiness</button>  
             </a>
