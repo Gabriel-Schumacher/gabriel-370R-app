@@ -165,9 +165,9 @@
 	</div>
 
 	{#if images.length > 0}
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+		<div class="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-3">
 			{#each images as image}
-				<div class="rounded-md border p-2 transition-shadow hover:shadow-md">
+				<div class="rounded-md p-2 shadow-lg m-2 transition-shadow hover:shadow-xl hover:bg-white hover:m-0 hover:border hover:border-primary-100">
 					{#if image.thumbnailUrl}
 						{@const debugUrl = image.thumbnailUrl}
 						{@const showDebug = () => console.log('Thumbnail URL:', debugUrl)}

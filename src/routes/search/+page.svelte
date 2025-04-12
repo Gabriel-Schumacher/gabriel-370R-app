@@ -64,7 +64,7 @@
 		{#each results as result, i}
 			<li class="flex items-center space-x-4 card rounded-lg bg-white p-4 shadow-md">
 				<div>
-					<img src={result.thumbnailUrl} alt={result.title} class="h-32 w-32" />
+					<img src={result.thumbnailUrl} alt={result.title} class="w-full h-auto" />
 				</div>
 				<div>
 					<p class="h4">Title: {result.title}</p>                    
