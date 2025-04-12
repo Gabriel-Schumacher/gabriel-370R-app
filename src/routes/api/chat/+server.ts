@@ -4,12 +4,13 @@ import weaviate, { type WeaviateClient } from 'weaviate-client';
 import type { ChunkObject } from '$lib/types/ChunkObject.ts';
 
 // Create a new OpenAI instance to connect with your OpenAI API key
-//const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY})
-
 const openai = new OpenAI({
-	baseURL: 'http://localhost:11434/v1',
-	apiKey: 'ollama' // required but unused
+    apiKey: process.env.OPENAI_API_KEY as string, // Use the API key from .env
 });
+// const openai = new OpenAI({
+// 	baseURL: 'http://localhost:11434/v1',
+// 	apiKey: 'ollama' // required but unused
+// });
 
 let client: WeaviateClient
 
@@ -174,7 +175,7 @@ export const POST = async ({ request }) => {
 				SYSTEM_PROMPTS[systemPrompt as SystemPromptKey]
 
 			const stream = await openai.chat.completions.create({
-				model: deepSeek ? 'deepseek-r1:8b' : 'llama3.2',
+				model: deepSeek ? 'deepseek-r1:8b' : 'gpt-4o', //llama3.2
 				//model: 'deepseek-r1:8b',
 				messages: [{ role: 'system', content: selectedPrompt }, ...body.chats],
 				stream: true

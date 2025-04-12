@@ -60,11 +60,19 @@ export const actions: Actions = {
 
         return {
             success: true,
-            data: images
+            images,
+            searchPerformed: true,
+            searchQuery: query
         }
 
         } catch (error) {
             console.error('Error in imageSearch action:', error)
+            return {
+                success: false,
+                searchPerformed: true,
+                message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                images: []
+            }
         }
     }
 }

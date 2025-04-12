@@ -24,12 +24,68 @@ function bufferToBase64(buffer: Buffer): string {
 }
 
 /**
+ * Process an image buffer and store it in the system
+ * @param buffer Original image buffer
+ * @param title Image title/description
+ * @returns Object with processing results
+ */
+async function processAndStoreImage(buffer: Buffer, title: string) {
+	try {
+		// Generate a unique ID for this image
+		const imageId = crypto.randomUUID()
+
+		// 1. Create thumbnail
+		const thumbnailBuffer = await sharp(buffer)
+			.resize(200, 200, { fit: 'cover' })
+			.jpeg({ quality: 80 })
+			.toBuffer()
+
+		// 2. Save thumbnail to static folder
+		const thumbnailDir = ensureThumbnailDir()
+		const thumbnailFilename = `${imageId}.jpg`
+		const thumbnailPath = path.join(thumbnailDir, thumbnailFilename)
+
+		writeFileSync(thumbnailPath, thumbnailBuffer)
+
+		// 3. Convert original to base64 for Weaviate
+		const base64Image = bufferToBase64(buffer)
+
+		// 4. Store image data in Weaviate with the imageId
+		const success = await addImageToCollection(title, base64Image, imageId)
+
+		if (success) {
+			return {
+				success: true,
+				imageId,
+				message: `Successfully processed image: ${title}`
+			}
+		} else {
+			// Try to clean up thumbnail if Weaviate insert failed
+			try {
+				await fs.unlink(thumbnailPath)
+			} catch (e) {
+				console.error('Failed to remove thumbnail after failed upload', e)
+			}
+			return {
+				success: false,
+				message: 'Failed to store image in database'
+			}
+		}
+	} catch (error) {
+		return {
+			success: false,
+			message: `Error processing image: ${error instanceof Error ? error.message : 'Unknown error'}`
+		}
+	}
+}
+
+/**
  * Add an image to the ImageCollection
  * @param title Text title for the image
  * @param imageBase64 Base64 encoded image data
  * @param imageId Unique ID for the image
  */
-async function addImageToCollection(title: string, imageBase64: string, imageId: string) {
+async function addImageToCollection(title: string, imageBase64: string, imageId: string): Promise<boolean> {
     try {
       await client.collections.get('ImageCollection').data.insert({
         title: title,
@@ -80,7 +136,16 @@ export const actions: Actions = {
 			const arrayBuffer = await imageFile.arrayBuffer()
 			const buffer = Buffer.from(arrayBuffer)
 
-			// 1. Create thumbnail
+			// Process and store the image
+			const result = await processAndStoreImage(buffer, imageTitle)
+
+			return {
+				success: result.success,
+				message: result.message,
+				imageId: result.imageId
+			}
+
+/* 			// 1. Create thumbnail
 			const thumbnailBuffer = await sharp(buffer)
 				.resize(200, 200, { fit: 'cover' })
 				.jpeg({ quality: 80 })
@@ -116,7 +181,7 @@ export const actions: Actions = {
 					success: false,
 					message: 'Failed to store image in database'
 				}
-			}
+			} */
 		} catch (error) {
 			console.error('Error in imageToBase64 action:', error)
 			return {
@@ -134,9 +199,11 @@ export async function load() {
         client = await connectToWeaviate();
       }
   
-      const images: { id: string; title: string; thumbnailUrl: string }[] = [];
+      let images: { id: string; title: string; thumbnailUrl: string }[] = [];
       try {
         const collection = client.collections.get('ImageCollection');
+
+		console.log('Collection:', collection.data.exists);
         
         // Just get the basic information and thumbnail path
         for await (const item of collection.iterator(

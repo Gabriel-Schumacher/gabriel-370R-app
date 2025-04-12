@@ -130,7 +130,7 @@
 
 			// put the answer into the chat history with role 'assistant'
 
-			chatHistory = [...chatHistory, { role: 'assistant', content: purifiedText }];
+			chatHistory = [...chatHistory, { role: 'assistant', content: purifiedText }, ];
 
 			console.log(answerText);
 		} catch (error) {

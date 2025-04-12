@@ -1,4 +1,4 @@
-import weaviate, { dataType, type WeaviateClient, type Collection, connectToLocal } from 'weaviate-client';
+import weaviate, { dataType, type WeaviateClient, type Collection } from 'weaviate-client';
 
 let client: WeaviateClient;
 
@@ -78,8 +78,8 @@ async function run() {
     client = await connectToWeaviate()
 
     
-    // await addCollection()
-    await getCollectionCount('Chunks')
+    await addCollection()
+    // await getCollectionCount('Chunks')
     // await client.collections.delete('Chunks')
 
     const endTime: Date = new Date()
