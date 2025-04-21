@@ -45,10 +45,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		// For flux-redux-dev model, reference image is required
-		if (modelName === 'flux-redux-dev' && !referenceImage) {
+		if ((modelName === 'flux-redux-dev' || modelName === 'flux-canny-dev') && !referenceImage) {
 			return json({ 
 				success: false, 
-				message: 'Reference image is required when using Flux Redux' 
+				message: 'Reference image is required for this model' 
 			}, { status: 400 })
 		}
 
@@ -113,7 +113,10 @@ export const POST: RequestHandler = async ({ request }) => {
 					strength: 0.7,
 					guidance_scale: 7.0,
 					negative_prompt: "ugly, disfigured, low quality, blurry, nsfw",
-					num_inference_steps: 40 // Higher quality
+					num_inference_steps: 40, // Higher quality
+					width: 768,
+					height: 768,
+					scheduler: "K_EULER_ANCESTRAL"
 				}
 				
 				// If reference image provided, use it for additional guidance
@@ -152,7 +155,10 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		}
 
-		console.log(`Refining with model: ${MODELS[modelName]}`);
+		console.log(`Refining with model: ${MODELS[modelName]}`, {
+			prompt: replicateInput.prompt,
+			model: MODELS[modelName]
+		});
 		
 		const imageData: any = await replicate.run(MODELS[modelName], {
 			input: replicateInput

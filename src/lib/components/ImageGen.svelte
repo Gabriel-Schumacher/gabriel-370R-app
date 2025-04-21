@@ -79,6 +79,7 @@
     // Handle model selection change
     function handleModelChange(model: string) {
         selectedModel = model;
+        console.log('Model changed to:', model);
     }
     
     function clearReferenceImage() {
@@ -95,9 +96,9 @@
             return;
         }
         
-        // If user selected flux-redux-dev but didn't provide a reference image
-        if ((selectedModel === 'flux-redux-dev' || selectedModel === 'flux-canny-dev') && !referenceImage) {
-            error = 'Reference image is required when using Flux Redux or Flux Canny';
+        // FIXED: Only Flux Canny requires a reference image
+        if (selectedModel === 'flux-canny-dev' && !referenceImage) {
+            error = 'Reference image is required when using Flux Canny';
             return;
         }
         
@@ -318,10 +319,10 @@
             </div>
             
             <!-- Reference Image Upload -->
-            {#if selectedModel === 'flux-redux-dev' || selectedModel === 'flux-canny-dev'}
+            {#if selectedModel === 'flux-canny-dev'}
             <div>
                 <label for="reference-image" class="mb-1 block text-sm font-medium text-gray-700">
-                    Reference Image {selectedModel === 'flux-canny-dev' ? '(Required)' : '(Optional)'}
+                    Reference Image (Required)
                 </label>
                 <div class="flex items-center gap-3">
                     <input

@@ -45,15 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ success: false, message: 'Invalid model selected' }, { status: 400 })
 		}
 
-		// For models requiring reference image
-		if ((modelName === 'flux-redux-dev' || modelName === 'flux-1.1-pro') && !referenceImage) {
-			return json({ 
-				success: false, 
-				message: 'Reference image is required for this model' 
-			}, { status: 400 })
-		}
-
-		// Process the reference image if provided
+			// Setup base input configuration
 		let replicateInput: any = {
 			prompt,
 			num_outputs: 1,
@@ -68,21 +60,20 @@ export const POST: RequestHandler = async ({ request }) => {
 				output_format: 'webp',
 				output_quality: 80,
 			};
-			
-			// Optional reference image for Flux Schnell
-			if (referenceImage) {
-				const arrayBuffer = await referenceImage.arrayBuffer();
-				const buffer = Buffer.from(arrayBuffer);
-				const base64Image = buffer.toString('base64');
-				const dataUrl = `data:${referenceImage.type};base64,${base64Image}`;
-				replicateInput.image = dataUrl;
-			}
 		} else if (modelName === 'flux-redux-dev') {
+				// Validate reference image for models that require it
+			if (!referenceImage) {
+				return json({ 
+					success: false, 
+					message: 'Reference image is required for flux-redux-dev model' 
+				}, { status: 400 })
+			}
+
 			// Process reference image for Flux Redux
-			const arrayBuffer = await referenceImage!.arrayBuffer();
+			const arrayBuffer = await referenceImage.arrayBuffer();
 			const buffer = Buffer.from(arrayBuffer);
 			const base64Image = buffer.toString('base64');
-			const dataUrl = `data:${referenceImage!.type};base64,${base64Image}`;
+			const dataUrl = `data:${referenceImage.type};base64,${base64Image}`;
 			
 			replicateInput = {
 				...replicateInput,
@@ -92,29 +83,27 @@ export const POST: RequestHandler = async ({ request }) => {
 				output_quality: 80,
 			};
 		} else if (modelName === 'flux-1.1-pro') {
-				// Now used as high-quality text-to-image model
-				replicateInput = {
-					...replicateInput,
-					guidance_scale: 7.0,
-					negative_prompt: "ugly, disfigured, low quality, blurry, nsfw",
-					num_inference_steps: 40 // Higher steps for better quality
-				};
-				
-				// Optional reference image can still be used if provided
-				if (referenceImage) {
-					const arrayBuffer = await referenceImage.arrayBuffer();
-					const buffer = Buffer.from(arrayBuffer);
-					const base64Image = buffer.toString('base64');
-					const dataUrl = `data:${referenceImage.type};base64,${base64Image}`;
-					replicateInput.image = dataUrl;
-					replicateInput.strength = 0.7;
-				}
+			// Now used as high-quality text-to-image model
+			replicateInput = {
+				...replicateInput,
+				guidance_scale: 7.0,
+				negative_prompt: "ugly, disfigured, low quality, blurry, nsfw",
+				num_inference_steps: 40 // Higher steps for better quality
+			};
 		} else if (modelName === 'flux-canny-dev') {
+			// Validate reference image for models that require it
+			if (!referenceImage) {
+				return json({ 
+					success: false, 
+					message: 'Reference image is required for flux-canny-dev model' 
+				}, { status: 400 })
+			}
+
 			// Process reference image for Flux Canny
-			const arrayBuffer = await referenceImage!.arrayBuffer();
+			const arrayBuffer = await referenceImage.arrayBuffer();
 			const buffer = Buffer.from(arrayBuffer);
 			const base64Image = buffer.toString('base64');
-			const dataUrl = `data:${referenceImage!.type};base64,${base64Image}`;
+			const dataUrl = `data:${referenceImage.type};base64,${base64Image}`;
 			
 			replicateInput = {
 				...replicateInput,
@@ -135,22 +124,58 @@ export const POST: RequestHandler = async ({ request }) => {
 			input: replicateInput
 		});
 
+			// Log the response for debugging
+		console.log(`Response from ${modelName}:`, JSON.stringify(imageData));
+
 		// Different models may return data in different formats
-		let resultImageUrl: string;
+		let resultImageUrl: string = '';
 		
-		if (modelName === 'flux-redux-dev') {
-			// Flux Redux returns a direct URL string
+		if (modelName === 'flux-redux-dev' || modelName === 'flux-canny-dev') {
+			// These models return a direct URL string
 			resultImageUrl = imageData as string;
-		} else if (modelName === 'flux-canny-dev') {
-			// Flux Canny likely returns output similarly to Flux Redux
-			resultImageUrl = imageData as string;
+		} else if (modelName === 'flux-1.1-pro') {
+			// Flux 1.1 Pro might return data in a different format
+			if (typeof imageData === 'string') {
+				resultImageUrl = imageData;
+			} else if (Array.isArray(imageData)) {
+				// If it's an array, try to get the first item
+				if (imageData.length > 0) {
+					// Check if it's an array of strings
+					if (typeof imageData[0] === 'string') {
+						resultImageUrl = imageData[0];
+					}
+					// Check if it has a url property or method
+					else if (imageData[0].url) {
+						resultImageUrl = typeof imageData[0].url === 'function' 
+							? imageData[0].url() 
+							: imageData[0].url;
+					}
+				}
+			} else if (imageData && typeof imageData === 'object') {
+				// It might be a single object with a URL property
+				if (imageData.url) {
+					resultImageUrl = typeof imageData.url === 'function' 
+						? imageData.url() 
+						: imageData.url;
+				} else if (imageData.output) {
+					// Some Replicate models return { output: ... }
+					const output = imageData.output;
+					if (typeof output === 'string') {
+						resultImageUrl = output;
+					} else if (Array.isArray(output) && output.length > 0) {
+						resultImageUrl = typeof output[0] === 'string' ? output[0] : '';
+					}
+				}
+			}
 		} else {
-			// Flux Schnell returns array with objects that have url() methods
-			// Flux Pro 1.1 returns similar format
-			resultImageUrl = Array.isArray(imageData) && imageData.length > 0 ? imageData[0].url() : '';
+			// Flux Schnell typically returns array with objects that have url() methods
+			resultImageUrl = Array.isArray(imageData) && imageData.length > 0 
+				? (typeof imageData[0].url === 'function' ? imageData[0].url() : imageData[0].url) 
+				: '';
 		}
 
 		if (!resultImageUrl) {
+			console.error('Failed to extract image URL. Full response:', JSON.stringify(imageData));
 			throw new Error('Failed to get image URL from model response');
 		}
 
