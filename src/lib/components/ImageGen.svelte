@@ -79,7 +79,7 @@
     // Handle model selection change
     function handleModelChange(model: string) {
         selectedModel = model;
-        console.log('Model changed to:', model);
+        // console.log('Model changed to:', model);
     }
     
     function clearReferenceImage() {
