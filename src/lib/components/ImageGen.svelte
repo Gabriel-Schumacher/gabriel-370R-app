@@ -312,7 +312,7 @@
                 <textarea
                     id="image-prompt"
                     bind:value={prompt}
-                    placeholder="A serene mountain landscape with a lake reflecting the sunset..."
+                    placeholder="A sea otter on a killer whale..."
                     rows="3"
                     class="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 ></textarea>
