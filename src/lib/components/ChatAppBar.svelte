@@ -21,7 +21,7 @@
 
   const models = [
     { id: 'gpt4o', name: 'GPT-4o' },
-    { id: 'deepseek', name: 'DeepSeek' },
+    { id: 'deepseek', name: 'DeepSeek (Local)' },
     { id: 'ollama', name: 'Ollama (Local)' }
   ];
 </script>
