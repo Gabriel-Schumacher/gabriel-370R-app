@@ -13,92 +13,177 @@ import { REPLICATE_API_TOKEN } from '$env/static/private'
 
 let client: WeaviateClient
 
-//const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const replicate = new Replicate({
   auth: REPLICATE_API_TOKEN,
 })
 
+// Model configuration for Replicate's models
+const MODELS = {
+  'flux-schnell': 'black-forest-labs/flux-schnell',
+  'flux-redux-dev': 'black-forest-labs/flux-redux-dev',
+  'flux-1.1-pro': 'black-forest-labs/flux-1.1-pro',
+  'flux-canny-dev': 'black-forest-labs/flux-canny-dev'
+}
+
 /**
- * Handles image generation requests using Gemma 3 via Ollama
+ * Handles image generation requests using Replicate's models
  */
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { prompt } = await request.json()
+		// Parse the FormData from the request
+		const formData = await request.formData()
+		const prompt = formData.get('prompt') as string
+		const referenceImage = formData.get('referenceImage') as File | null
+		const modelName = formData.get('model') as string || 'flux-schnell' // Default to flux-schnell
 
 		if (!prompt) {
 			return json({ success: false, message: 'Prompt is required' }, { status: 400 })
 		}
 
-		// Call OpenAI API to generate image with OpenAI
-		//const imageData = await generateImageWithOpenAI(prompt)
+		// Validate model selection
+		if (!MODELS[modelName]) {
+			return json({ success: false, message: 'Invalid model selected' }, { status: 400 })
+		}
 
-		// Call Replicate API to generate image with black forest labs flux-schnell
-		const imageData: any = await replicate.run('black-forest-labs/flux-schnell', {
-			input: {
-				prompt,
+		// For models requiring reference image
+		if ((modelName === 'flux-redux-dev' || modelName === 'flux-1.1-pro') && !referenceImage) {
+			return json({ 
+				success: false, 
+				message: 'Reference image is required for this model' 
+			}, { status: 400 })
+		}
+
+		// Process the reference image if provided
+		let replicateInput: any = {
+			prompt,
+			num_outputs: 1,
+		};
+
+		// Model-specific configurations
+		if (modelName === 'flux-schnell') {
+			replicateInput = {
+				...replicateInput,
 				go_fast: true,
-				num_outputs: 1,
 				aspect_ratio: '1:1',
 				output_format: 'webp',
 				output_quality: 80,
+			};
+			
+			// Optional reference image for Flux Schnell
+			if (referenceImage) {
+				const arrayBuffer = await referenceImage.arrayBuffer();
+				const buffer = Buffer.from(arrayBuffer);
+				const base64Image = buffer.toString('base64');
+				const dataUrl = `data:${referenceImage.type};base64,${base64Image}`;
+				replicateInput.image = dataUrl;
 			}
-		})
-
-		console.log('Image data:', imageData)
-
-		if (!imageData || imageData.length === 0) {
-			throw new Error('Failed to generate image')
+		} else if (modelName === 'flux-redux-dev') {
+			// Process reference image for Flux Redux
+			const arrayBuffer = await referenceImage!.arrayBuffer();
+			const buffer = Buffer.from(arrayBuffer);
+			const base64Image = buffer.toString('base64');
+			const dataUrl = `data:${referenceImage!.type};base64,${base64Image}`;
+			
+			replicateInput = {
+				...replicateInput,
+				redux_image: dataUrl,
+				scale: 0.8,
+				output_format: 'webp',
+				output_quality: 80,
+			};
+		} else if (modelName === 'flux-1.1-pro') {
+				// Now used as high-quality text-to-image model
+				replicateInput = {
+					...replicateInput,
+					guidance_scale: 7.0,
+					negative_prompt: "ugly, disfigured, low quality, blurry, nsfw",
+					num_inference_steps: 40 // Higher steps for better quality
+				};
+				
+				// Optional reference image can still be used if provided
+				if (referenceImage) {
+					const arrayBuffer = await referenceImage.arrayBuffer();
+					const buffer = Buffer.from(arrayBuffer);
+					const base64Image = buffer.toString('base64');
+					const dataUrl = `data:${referenceImage.type};base64,${base64Image}`;
+					replicateInput.image = dataUrl;
+					replicateInput.strength = 0.7;
+				}
+		} else if (modelName === 'flux-canny-dev') {
+			// Process reference image for Flux Canny
+			const arrayBuffer = await referenceImage!.arrayBuffer();
+			const buffer = Buffer.from(arrayBuffer);
+			const base64Image = buffer.toString('base64');
+			const dataUrl = `data:${referenceImage!.type};base64,${base64Image}`;
+			
+			replicateInput = {
+				...replicateInput,
+				control_image: dataUrl, // This is the parameter name for Flux Canny
+				guidance_scale: 7.0,
+				negative_prompt: "ugly, disfigured, low quality, blurry, nsfw",
+			};
 		}
 
-		const imageResponse = await fetch(imageData[0].url())
-		const imageArrayBuffer = await imageResponse.arrayBuffer()
-		const base64ImageBuffer = Buffer.from(imageArrayBuffer).toString('base64')
+		console.log(`Using model: ${MODELS[modelName]} with parameters:`, {
+			...replicateInput,
+			image: replicateInput.image ? "[BASE64_IMAGE]" : undefined,
+			redux_image: replicateInput.redux_image ? "[BASE64_IMAGE]" : undefined,
+			control_image: replicateInput.control_image ? "[BASE64_IMAGE]" : undefined
+		});
 
+		const imageData: any = await replicate.run(MODELS[modelName], {
+			input: replicateInput
+		});
+
+		// Different models may return data in different formats
+		let resultImageUrl: string;
+		
+		if (modelName === 'flux-redux-dev') {
+			// Flux Redux returns a direct URL string
+			resultImageUrl = imageData as string;
+		} else if (modelName === 'flux-canny-dev') {
+			// Flux Canny likely returns output similarly to Flux Redux
+			resultImageUrl = imageData as string;
+		} else {
+			// Flux Schnell returns array with objects that have url() methods
+			// Flux Pro 1.1 returns similar format
+			resultImageUrl = Array.isArray(imageData) && imageData.length > 0 ? imageData[0].url() : '';
+		}
+
+		if (!resultImageUrl) {
+			throw new Error('Failed to get image URL from model response');
+		}
+
+		// Download and save the image
+		const imageResponse = await fetch(resultImageUrl);
+		const imageArrayBuffer = await imageResponse.arrayBuffer();
+		const base64ImageBuffer = Buffer.from(imageArrayBuffer).toString('base64');
 
 		// Save the generated image to a static directory
-		const imageId = crypto.randomUUID()
-		const imagePath = `${imageId}.png`
-		const fullPath = path.join(process.cwd(), 'static', imagePath)
+		const imageId = crypto.randomUUID();
+		const imagePath = `${imageId}.png`;
+		const fullPath = path.join(process.cwd(), 'static', imagePath);
 
 		// Ensure directory exists
-		await fs.mkdir(path.dirname(fullPath), { recursive: true })
+		await fs.mkdir(path.dirname(fullPath), { recursive: true });
 
 		// Save the image buffer to disk
-		await fs.writeFile(fullPath, Buffer.from(base64ImageBuffer, 'base64'))
-
-/* 		// 1. Create thumbnail
-				const thumbnailBuffer = await sharp(Buffer.from(imageData, 'base64'))
-					.resize(200, 200, { fit: 'cover' })
-					.jpeg({ quality: 80 })
-					.toBuffer()
-		
-				// 2. Save thumbnail to static folder
-				const thumbnailDir = ensureThumbnailDir()
-				const thumbnailFilename = `${imageId}.jpg`
-				const thumbnailPath = path.join(thumbnailDir, thumbnailFilename)
-		
-				writeFileSync(thumbnailPath, thumbnailBuffer)
-		
-				// 3. Convert original to base64 for Weaviate
-				const base64Image = bufferToBase64(Buffer.from(imageData, 'base64'))
-		
-				// 4. Store image data in Weaviate with the imageId
-				const success = await addImageToCollection(prompt, base64Image, imageId) */
+		await fs.writeFile(fullPath, Buffer.from(base64ImageBuffer, 'base64'));
 
 		return json({
 			success: true,
 			imageUrl: imagePath,
 			imageId
-		})
+		});
 	} catch (error) {
-		console.error('Image generation error:', error)
+		console.error('Image generation error:', error);
 		return json(
 			{
 				success: false,
 				message: error instanceof Error ? error.message : 'Failed to generate image'
 			},
 			{ status: 500 }
-		)
+		);
 	}
 }
 
