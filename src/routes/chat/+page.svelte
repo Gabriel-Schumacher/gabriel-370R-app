@@ -36,6 +36,7 @@
 
 	let systemPrompt = $state('Hal 9000');
 	let examplePrompt = $state('');
+	let selectedModel = $state('gpt4o');
 	let deepSeek = $state(false);
 	let fileNames = $state([] as string[])
 
@@ -112,7 +113,7 @@
 					body: JSON.stringify({
 						chats: chatHistory,
 						systemPrompt,
-						deepSeek,
+						model: selectedModel,
 						fileNames,
 					})
 				})
@@ -182,7 +183,8 @@
         <ChatAppBar
             bind:selectedSystemPrompt={systemPrompt}
             bind:selectedExamplePrompt={examplePrompt}
-            bind:deepSeek
+            bind:selectedModel={selectedModel}
+
         />
     </div>
 

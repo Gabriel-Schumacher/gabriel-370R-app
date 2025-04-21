@@ -4,13 +4,15 @@ import weaviate, { type WeaviateClient } from 'weaviate-client';
 import type { ChunkObject } from '$lib/types/ChunkObject.ts';
 
 // Create a new OpenAI instance to connect with your OpenAI API key
-const openai = new OpenAI({
+const openaiOfficial = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY as string, // Use the API key from .env
 });
-// const openai = new OpenAI({
-// 	baseURL: 'http://localhost:11434/v1',
-// 	apiKey: 'ollama' // required but unused
-// });
+
+// Create Ollama client
+const ollamaClient = new OpenAI({
+	baseURL: 'http://localhost:11434/v1',
+	apiKey: 'ollama' // required but unused
+});
 
 let client: WeaviateClient
 
@@ -115,7 +117,7 @@ export const POST = async ({ request }) => {
 	try {
 		client = await connectToWeaviate()
 		const body: MessageBody = await request.json()
-		const { chats, systemPrompt, deepSeek, fileNames } = body
+		const { chats, systemPrompt, model, fileNames } = body
 
 		if (!chats || !Array.isArray(chats)) {
 			return new Response('Invalid chat history', { status: 400 })
@@ -173,10 +175,31 @@ export const POST = async ({ request }) => {
 		} else {
 			const selectedPrompt =
 				SYSTEM_PROMPTS[systemPrompt as SystemPromptKey]
+                
+			// Select appropriate client and model based on user selection
+			let client;
+			let modelToUse;
+			
+			switch(model) {
+				case 'gpt4o':
+					client = openaiOfficial;
+					modelToUse = 'gpt-4o';
+					break;
+				case 'deepseek':
+					client = ollamaClient;
+					modelToUse = 'deepseek-r1:8b';
+					break;
+				case 'ollama':
+					client = ollamaClient;
+					modelToUse = 'llama3.2';  // Change to whatever model you want to use with Ollama
+					break;
+				default:
+					client = openaiOfficial;
+					modelToUse = 'gpt-4o';
+			}
 
-			const stream = await openai.chat.completions.create({
-				model: deepSeek ? 'deepseek-r1:8b' : 'gpt-4o', //llama3.2
-				//model: 'deepseek-r1:8b',
+			const stream = await client.chat.completions.create({
+				model: modelToUse,
 				messages: [{ role: 'system', content: selectedPrompt }, ...body.chats],
 				stream: true
 			})

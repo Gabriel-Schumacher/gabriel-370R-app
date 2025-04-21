@@ -4,8 +4,11 @@ interface Message {
 }
 
 export interface MessageBody {
-    chats: Message[];
+    chats: Array<{
+        role: string;
+        content: string;
+    }>;
     systemPrompt: string;
-    deepSeek: boolean;
+    model: string;
     fileNames?: string[];
 }
