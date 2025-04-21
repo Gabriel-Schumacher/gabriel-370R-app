@@ -20,6 +20,11 @@
             </a>
         </li>
         <li>
+            <a href="../imageGen/">
+                <button class="btn preset-filled-primary-500">Image Generation</button>  
+            </a>
+        </li>
+        <li>
             <a href="../check_readiness/">
                 <button class="btn preset-filled-primary-500">Check Readiness</button>  
             </a>

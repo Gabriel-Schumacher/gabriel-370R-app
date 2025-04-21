@@ -54,6 +54,7 @@
 		"marked-highlight": "^2.2.1",
 		"openai": "^4.78.1",
 		"pdf-parse": "^1.1.1",
+		"replicate": "^1.0.1",
 		"run": "^1.5.0",
 		"sharp": "^0.33.5",
 		"tsx": "^4.19.3",
