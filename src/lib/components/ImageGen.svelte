@@ -406,6 +406,7 @@
                 </div>
                 
                 <!-- Refinement section -->
+                 {#if selectedModel === 'flux-schnell'}
                 <div class="mt-4 space-y-3 rounded-lg bg-gray-50 p-4">
                     <h3 class="text-lg font-medium">Refine your image</h3>
                     <textarea
@@ -424,6 +425,7 @@
                         {isGenerating ? 'Refining...' : 'Refine Image'}
                     </button>
                 </div>
+                {/if}
             </div>
         {/if}
         
