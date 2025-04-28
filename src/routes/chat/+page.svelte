@@ -37,7 +37,7 @@
 	let systemPrompt = $state('Hal 9000');
 	let examplePrompt = $state('');
 	let selectedModel = $state('gpt4o');
-	let deepSeek = $state(false);
+	// let deepSeek = $state(false);
 	let fileNames = $state([] as string[])
 
 	let chatHistory = $state(
@@ -156,185 +156,170 @@
 	}
 
 	$effect(() => {
-	scrollToBottom();
+		scrollToBottom();
 
-	// Run the async function without making $effect async
-	(async () => {
-		if (response.text !== '') {
-			// Strip <think> tags from the response text
-			const cleanedText = stripThinkTags(response.text);
-			const parsedText = await marked.parse(cleanedText);
-			responseText = DOMPurify.sanitize(parsedText)
-				.replace(/<script>/g, '&lt;script&gt;')
-				.replace(/<\/script>/g, '&lt;/script&gt;');
+		// Run the async function without making $effect async
+		(async () => {
+			if (response.text !== '') {
+				// Strip <think> tags from the response text
+				const cleanedText = stripThinkTags(response.text);
+				const parsedText = await marked.parse(cleanedText);
+				responseText = DOMPurify.sanitize(parsedText)
+					.replace(/<script>/g, '&lt;script&gt;')
+					.replace(/<\/script>/g, '&lt;/script&gt;');
 			}
 		})();
 	});
-	
-
-
 </script>
 
-<main class="flex min-h-screen flex-col bg-gray-50">
-	<div class="hover-area">
-		<img src="/setting-icon.png" alt="Settings" class="w-10 h-10 m-8" />
-	</div>
-    <div class="side-nav bg-secondary-300 text-white">
-        <ChatAppBar
-            bind:selectedSystemPrompt={systemPrompt}
-            bind:selectedExamplePrompt={examplePrompt}
-            bind:selectedModel={selectedModel}
+<main class="flex min-h-screen bg-gray-50">
+	<!-- Sidebar -->
+	<aside class="bg-secondary-900 text-white w-72 flex flex-col h-screen transition-all duration-300 ease-in-out overflow-auto shadow-md">
+		
+		<ChatAppBar
+			bind:selectedSystemPrompt={systemPrompt}
+			bind:selectedExamplePrompt={examplePrompt}
+			bind:selectedModel={selectedModel}
+		/>
 
-        />
-    </div>
+		<div class="mt-auto p-4 border-t border-secondary-700">
+			<button 
+				type="button" 
+				class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-secondary-300 hover:bg-secondary-700 transition-colors text-sm font-medium"
+				onclick={deleteAllChats}
+			>
+				<span class="material-icons"><img src="/trash-solid.svg" alt="delete" width="15" height="15" class="invert"></span>
+				Clear Conversations
+			</button>
+		</div>
+	</aside>
 
-
-	<div class="mx-auto max-w-[75%] min-w-[75%]">
-		<form
-			onsubmit={handleSubmit}
-			class="m-4 p-2 flex flex-col"
-		>
-			<div class="space-y-4">
-				
-
-				<!-- Need to display each chat item here -->
-				 <div class="chat-container h-[60vh] overflow-y-auto space-y-4 px-4">
-				<div class="flex space-x-2">
-					<Avatar src="/hal9000.jpg" name="Hal tutor image" />
-					<div class="assistant-chat">Good Afternoon. How can I help you?</div>
-				</div>					
-					{#each chatHistory as chat, i}
-						{#if chat.role === 'user'}
-							<div class="ml-auto flex justify-end">
-								<div class="user-chat">
-									{chat.content}
-								</div>
-								<div>
-									<Avatar src="/userAvatar.png" name="User image" />
-								</div>							
-							</div>
-							<!-- this else handles the assistant role chat display -->
-						{:else}
-							<div class="mr-4 flex">
-								<div>
-									<Avatar src="/hal9000.jpg" name="Hal tutor image" />
-								</div>
-								<div class="assistant-chat">
-									{@html chat.content}
-								</div>
-							</div>
-						{/if}
-					{/each}
-
-					{#if response.loading}
-						{#await new Promise((res) => setTimeout(res, 400)) then _}
-							<div class="flex">
-								<div class="flex space-x-2">
-									<div>
-										<Avatar name="Hal tutor image" src={'/hal9000.jpg'} />										
-									</div>
-
-									<div class="assistant-chat">
-										{#if response.text === ''}
-											<div class="flex">
-												<p>Collating &nbsp;</p>
-												<TypingIndicator />											
-											</div>
-
-										{:else}
-											{@html responseText}
-										{/if}
-									</div>
-								</div>
-							</div>
-						{/await}
-					{/if}		
-					<br>			
-				 </div>
-
-				<div class="space-y-4">
-					<hr />
-					<div class="flex space-x-4">
-						<textarea
-							onkeydown={handleKeydown}
-							class="textarea"
-							required
-							placeholder="Type your message..."
-							name="message"
-							rows="3"
-							bind:value={examplePrompt}
-						></textarea>
-						<div class="flex flex-col justify-between">
-							<button type="submit" class="btn preset-filled-primary-200-800">Send</button>
-							<button type="button" class="btn preset-filled-secondary-200-800" onclick={deleteAllChats}>Clear Chats</button>
-						</div>
+	<!-- Chat Area -->
+	<div class="flex-1 flex flex-col h-[80vh]">
+		<!-- Chat Header -->
+		<header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+			<h1 class="text-xl font-medium">Chat with {systemPrompt}</h1>
+			<div class="flex items-center gap-2">
+				<div class="px-2 py-1 rounded-full bg-gray-100 text-secondary-700 text-xs font-medium">
+					{selectedModel}
+				</div>
+				{#if fileNames.length > 0}
+					<div class="px-2 py-1 rounded-full bg-blue-100 text-blue-500 text-xs font-medium">
+						{fileNames.length} file{fileNames.length > 1 ? 's' : ''}
 					</div>
+				{/if}
+			</div>
+		</header>
+
+		<!-- Chat Messages -->
+		<div class="flex-1 overflow-y-auto p-4 space-y-6 chat-container mx-20">
+			<!-- Initial greeting message -->
+			<div class="flex items-start gap-3 max-w-4xl">
+				<!-- <div class="flex-shrink-0">
+					<Avatar src="/hal9000.jpg" name="Hal tutor image" />
+				</div> -->
+				<div class="text-secondary-900 max-w-[90%]">
+					<p>Hello! I'm your AI assistant. How can I help you today?</p>
 				</div>
 			</div>
-		</form>
-		<div class="flex gap-1">
-			<FileUploadAside/>
-			<div>
-				<p>You can also upload a file. I will do my best to help you!</p>
-				{#if fileNames.length > 0}
-				<div class="flex items-center gap-4 flex-wrap">
+			
+			<!-- Chat history -->
+			{#each chatHistory as chat, i}
+				{#if chat.role === 'user'}
+					<div class="flex items-start gap-3 max-w-3xl ml-auto justify-end">
+						<div class="p-4 rounded-lg max-w-[80%] bg-primary-500 text-white rounded-bl-none">
+							{chat.content}
+						</div>
+						<!-- <div class="flex-shrink-0">
+							<Avatar src="/userAvatar.png" name="User image" />
+						</div> -->
+					</div>
+				{:else}
+					<div class="flex items-start gap-3 max-w-4xl">
+						<!-- <div class="flex-shrink-0">
+							<Avatar src="/hal9000.jpg" name="Hal tutor image" />
+						</div> -->
+						<div class="max-w-[90%] text-secondary-900">
+							{@html chat.content}
+						</div>
+					</div>
+				{/if}
+			{/each}
+
+			<!-- Loading state -->
+			{#if response.loading}
+				{#await new Promise((res) => setTimeout(res, 400)) then _}
+					<div class="flex items-start gap-3 max-w-4xl">
+						<!-- <div class="flex-shrink-0">
+							<Avatar name="Hal tutor image" src="/hal9000.jpg" />
+						</div> -->
+						<div class="max-w-[90%] text-secondary-900">
+							{#if response.text === ''}
+								<div class="flex items-center">
+									<span>Thinking</span>
+									<TypingIndicator />
+								</div>
+							{:else}
+								{@html responseText}
+							{/if}
+						</div>
+					</div>
+				{/await}
+			{/if}
+		</div>
+
+		<!-- File display area -->
+		{#if fileNames.length > 0}
+			<div class="px-4 py-2 border-t border-gray-200 bg-gray-50">
+				<h3 class="text-sm font-medium text-gray-500">Uploaded Files:</h3>
+				<div class="flex flex-wrap gap-2 mt-1">
 					{#each fileNames as fileName}
-						<div class="flex items-center gap-2">
-							<button
-								type="button"
-								class="btn preset-filled-primary-500">
-								<span>{fileName}</span>
-								<CircleX onclick={() => deleteFileName(fileName)} />
+						<div class="flex items-center gap-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-xs">
+							<span class="truncate max-w-[150px]">{fileName}</span>
+							<button 
+								type="button" 
+								class="text-primary-400 hover:text-primary-700" 
+								onclick={() => deleteFileName(fileName)} 
+								aria-label="Remove file {fileName}"
+							>
+								<CircleX size={16} />
 							</button>
 						</div>
 					{/each}
 				</div>
-			{/if}
-			</div>			
-		</div>
+			</div>
+		{/if}
 
+		<!-- Chat Input -->
+		<form onsubmit={handleSubmit} class="p-4 border-t border-gray-200 bg-white">
+			<div class="flex items-end rounded-lg border border-gray-300 bg-white overflow-hidden shadow-sm">
+				<textarea
+					onkeydown={handleKeydown}
+					class="w-full p-3 focus:outline-none resize-none text-secondary-900"
+					required
+					placeholder="Message HAL..."
+					name="message"
+					rows="1"
+					bind:value={examplePrompt}
+					style="max-height: 200px;"
+				></textarea>
+				
+				<div class="flex items-center p-2">
+					<FileUploadAside />
+					<button 
+						type="submit" 
+						class="p-2 rounded-full bg-primary-500 text-white ml-1 flex items-center justify-center hover:bg-primary-600 transition-colors h-9 w-9 disabled:bg-gray-300 disabled:cursor-not-allowed" 
+						disabled={response.loading} 
+						aria-label="Send message"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 2L11 13"></path>
+							<path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+						</svg>
+					</button>
+				</div>
+			</div>
+		</form>
 	</div>
 </main>
 
-<style lang="postcss">
-	.assistant-chat {
-		background-color: white;
-		margin: 0 1rem;
-		padding: 1rem;
-		border-radius: 0.5rem;
-		box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
-	}
-	.user-chat {
-		background-color: rgb(var(--color-primary-200) / var(--tw-bg-opacity, 1));
-		margin: 0 1rem;
-		padding: 1rem;
-		border-radius: 0.5rem;
-		box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
-	}
-	.side-nav {
-		position: fixed;
-		top: 0;
-		left: -250px; /* Hide the nav initially */
-		width: 250px;
-		height: 100%;
-		transition: left 0.3s ease;
-		z-index: 1000;
-		padding: 1rem;
-	}
-
-	/* Adjust hover area to trigger the nav slide */
-	.side-nav:hover,
-	.hover-area:hover + .side-nav {
-		left: 0; /* Show the nav on hover */
-	}
-
-	/* Add a hover area to trigger the nav slide */
-	.hover-area {
-		position: fixed;
-		top: 20;
-		left: 0;
-		width: 50px; /* Adjust this value to change the hover area width */
-		height: 100%;
-		z-index: 999;
-	}
-	</style>

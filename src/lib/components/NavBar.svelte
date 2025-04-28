@@ -2,7 +2,7 @@
 
 </script>
 
-<nav class="w-full p-4 mb-4 bg-secondary-800 text-white">
+<nav class="w-full p-4 bg-secondary-800 text-white">
     <ul class="w-[75%] mx-auto flex space-x-4 justify-end">
         <li>
             <a href="../chat/">
