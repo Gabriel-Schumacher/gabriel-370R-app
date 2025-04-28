@@ -227,7 +227,7 @@
 			{#each chatHistory as chat, i}
 				{#if chat.role === 'user'}
 					<div class="flex items-start gap-3 max-w-3xl ml-auto justify-end">
-						<div class="p-4 rounded-lg max-w-[80%] bg-primary-500 text-white rounded-bl-none">
+						<div class="p-4 rounded-lg max-w-[60%] bg-primary-500 text-white rounded-bl-none">
 							{chat.content}
 						</div>
 						<!-- <div class="flex-shrink-0">
@@ -235,11 +235,11 @@
 						</div> -->
 					</div>
 				{:else}
-					<div class="flex items-start gap-3 max-w-4xl">
+					<div class="flex items-start gap-3">
 						<!-- <div class="flex-shrink-0">
 							<Avatar src="/hal9000.jpg" name="Hal tutor image" />
 						</div> -->
-						<div class="max-w-[90%] text-secondary-900">
+						<div class="text-secondary-900">
 							{@html chat.content}
 						</div>
 					</div>
@@ -303,12 +303,9 @@
 					bind:value={examplePrompt}
 					style="max-height: 200px;"
 				></textarea>
-				
-				<div class="flex items-center p-2">
-					<FileUploadAside />
 					<button 
 						type="submit" 
-						class="p-2 rounded-full bg-primary-500 text-white ml-1 flex items-center justify-center hover:bg-primary-600 transition-colors h-9 w-9 disabled:bg-gray-300 disabled:cursor-not-allowed" 
+						class="p-2 rounded-full bg-primary-500 text-white m-1 flex items-center justify-center hover:bg-primary-600 transition-colors h-9 w-9 disabled:bg-gray-300 disabled:cursor-not-allowed" 
 						disabled={response.loading} 
 						aria-label="Send message"
 					>
@@ -316,9 +313,13 @@
 							<path d="M22 2L11 13"></path>
 							<path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
 						</svg>
-					</button>
-				</div>
+					</button>				
+
 			</div>
+				<div class="flex items-center p-2">
+					<FileUploadAside />
+
+				</div>			
 		</form>
 	</div>
 </main>
