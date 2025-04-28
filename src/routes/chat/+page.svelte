@@ -182,7 +182,7 @@
 			bind:selectedModel={selectedModel}
 		/>
 
-		<div class="mt-auto p-4 border-t border-secondary-700">
+		<div class="mt-8 p-4 border-t border-secondary-700">
 			<button 
 				type="button" 
 				class="flex items-center gap-2 w-full py-2 px-3 rounded-md text-secondary-300 hover:bg-secondary-700 transition-colors text-sm font-medium"
