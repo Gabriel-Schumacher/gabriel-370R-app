@@ -295,9 +295,9 @@
 			<div class="flex items-end rounded-lg border border-gray-300 bg-white overflow-hidden shadow-sm">
 				<textarea
 					onkeydown={handleKeydown}
-					class="w-full p-3 focus:outline-none resize-none text-secondary-900"
+					class="w-full p-3 focus:outline-none text-secondary-900"
 					required
-					placeholder="Message HAL..."
+					placeholder="Message..."
 					name="message"
 					rows="1"
 					bind:value={examplePrompt}
